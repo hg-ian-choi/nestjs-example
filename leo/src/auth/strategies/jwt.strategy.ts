@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { jwtConstants } from '../constants';
@@ -7,7 +7,12 @@ import { jwtConstants } from '../constants';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (_request) => {
+          console.log('_request', _request?.signedCookies?.w_auth);
+          return _request?.signedCookies?.w_auth;
+        },
+      ]),
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secret,
     });
@@ -17,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     id: number;
     username: string;
   }): Promise<{ id: number; username: string }> {
-    console.log('!!!');
+    Logger.verbose('JwtStrategy validate()');
     return _payload;
   }
 }
