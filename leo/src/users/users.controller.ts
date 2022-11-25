@@ -33,6 +33,7 @@ export class UsersController {
     return this.usersService.findOne(_id);
   }
 
+  @UseGuards(OnlyOwner)
   @Delete(':id')
   async remove(@Param('id') _id: number): Promise<void> {
     return this.usersService.remove(_id);
