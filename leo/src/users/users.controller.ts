@@ -16,10 +16,10 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  async create(@Body() _user: User): Promise<void> {
-    return this.usersService.create(_user);
-  }
+  // @Post()
+  // async create(@Body() _user: User): Promise<User> {
+  //   return this.usersService.create(_user);
+  // }
 
   @Public()
   @Get()

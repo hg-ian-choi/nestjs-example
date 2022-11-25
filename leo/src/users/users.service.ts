@@ -11,9 +11,10 @@ export class UsersService {
   ) {}
 
   // ************************************ CREATE ************************************ //
-  async create(_user: User): Promise<void> {
+  async create(_user: User): Promise<User> {
     const user = this.usersRepository.create(_user);
-    await this.usersRepository.save(user);
+    const result = await this.usersRepository.save(user);
+    return result;
   }
 
   // ************************************ READ ************************************ //

@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Logger,
@@ -33,6 +34,7 @@ export class AuthController {
       path: '/',
       signed: true,
       httpOnly: true,
+      secure: true,
     });
   }
 
@@ -41,5 +43,11 @@ export class AuthController {
   getProfile(@Req() _req: any): Promise<any> {
     Logger.verbose('AuthController getProfile');
     return _req.user;
+  }
+
+  @Public()
+  @Post('register')
+  async register(@Body() _user: User): Promise<any> {
+    return this.authService.register(_user);
   }
 }

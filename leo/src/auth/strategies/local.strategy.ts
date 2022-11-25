@@ -14,7 +14,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     _password: string,
   ): Promise<{ id: number; username: string }> {
     Logger.verbose('LocalStrategy validate()');
-    const user = await this.authService.vaildateUser('test2', 'test2');
+    const user = await this.authService.vaildateUser(_username, _password);
 
     if (!user) {
       throw new UnauthorizedException();
