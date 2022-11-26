@@ -34,7 +34,8 @@ export class AuthService {
 
   async login(_user: User): Promise<string> {
     Logger.verbose('AuthService login()');
-    const token = this.jwtService.sign(_user);
+    const paylod = { id: _user.id, username: _user.username };
+    const token = this.jwtService.sign(paylod);
     return token;
   }
 
