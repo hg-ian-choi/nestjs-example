@@ -3,11 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { compare, hash } from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -32,11 +34,27 @@ export class AuthService {
     }
   }
 
-  async login(_user: User): Promise<string> {
+  async signIn(_user: User): Promise<any> {
     Logger.verbose('AuthService login()');
     const paylod = { id: _user.id, username: _user.username };
     const token = this.jwtService.sign(paylod);
-    return token;
+    return {
+      token: token,
+      domain: this.configService.get<string>('DOMAIN'),
+      path: this.configService.get<string>('PATH'),
+      secure: true,
+      maxAge: this.configService.get<number>('AT_MAXAGE'),
+    };
+  }
+
+  async signOut(): Promise<any> {
+    return {
+      token: '',
+      domain: this.configService.get<string>('DOMAIN'),
+      path: this.configService.get<string>('PATH'),
+      secure: true,
+      maxAge: 0,
+    };
   }
 
   async register(_user: User): Promise<any> {

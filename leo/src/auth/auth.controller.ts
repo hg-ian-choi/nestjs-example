@@ -22,20 +22,20 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Public()
-  @Post('login')
-  async login(
+  @Post('signin')
+  async signIn(
     @GetUser() _user: User,
     @Res({ passthrough: true }) _res: Response,
   ): Promise<any> {
     Logger.verbose('AuthController login()');
-    const token = await this.authService.login(_user);
-    _res.cookie('w_auth', token, {
-      domain: 'localhost',
-      path: '/',
-      signed: true,
-      httpOnly: true,
-      secure: true,
-    });
+    const { token, ...option } = await this.authService.signIn(_user);
+    _res.cookie('w_auth', token, option);
+  }
+
+  @Post('signout')
+  async signOut(@Res({ passthrough: true }) _res: Response) {
+    const { token, ...option } = await this.authService.signOut();
+    _res.cookie('w_auth', token, option);
   }
 
   @UseGuards(JwtAuthGuard)
