@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { jwtConstants } from '../constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (_request) => {
@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: jwtConstants.secret,
+      secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
 

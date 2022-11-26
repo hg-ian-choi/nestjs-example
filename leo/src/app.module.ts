@@ -16,6 +16,8 @@ import * as Joi from '@hapi/joi';
         DB_USER: Joi.string().required(),
         DB_PW: Joi.string().required(),
         DB_NAME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRESIN: Joi.string().required(),
       }),
     }),
     UsersModule,
