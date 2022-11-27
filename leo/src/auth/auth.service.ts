@@ -34,12 +34,15 @@ export class AuthService {
     }
   }
 
-  async signIn(_user: User): Promise<any> {
-    Logger.verbose('AuthService login()');
-    const paylod = { id: _user.id, username: _user.username };
-    const token = this.jwtService.sign(paylod);
+  getCookieWithJwtAccessToken(_id: number) {
+    const paylod = { _id };
+    const token = this.jwtService.sign(paylod, {
+      secret: this.configService.get('AT_JWT_SECRET'),
+      expiresIn: this.configService.get('AT_JWT_EXPIRESIN'),
+    });
+
     return {
-      token: token,
+      accessToken: token,
       domain: this.configService.get<string>('DOMAIN'),
       path: this.configService.get<string>('PATH'),
       secure: true,
@@ -47,15 +50,63 @@ export class AuthService {
     };
   }
 
-  async signOut(): Promise<any> {
+  getCookieWithJwtRefreshToken(_id: number) {
+    const paylod = { _id };
+    const token = this.jwtService.sign(paylod, {
+      secret: this.configService.get('RT_JWT_SECRET'),
+      expiresIn: this.configService.get('RT_JWT_EXPIRESIN'),
+    });
+
     return {
-      token: '',
+      refreshToken: token,
       domain: this.configService.get<string>('DOMAIN'),
       path: this.configService.get<string>('PATH'),
       secure: true,
-      maxAge: 0,
+      maxAge: this.configService.get<number>('AT_MAXAGE'),
     };
   }
+
+  getCookiesForLogOut() {
+    return {
+      accessOption: {
+        refreshToken: '',
+        domain: this.configService.get<string>('DOMAIN'),
+        path: this.configService.get<string>('PATH'),
+        secure: true,
+        maxAge: 0,
+      },
+      refreshOption: {
+        refreshToken: '',
+        domain: this.configService.get<string>('DOMAIN'),
+        path: this.configService.get<string>('PATH'),
+        secure: true,
+        maxAge: 0,
+      },
+    };
+  }
+
+  // async signIn(_user: User): Promise<any> {
+  //   Logger.verbose('AuthService login()');
+  //   const paylod = { id: _user.id, username: _user.username };
+  //   const token = this.jwtService.sign(paylod);
+  //   return {
+  //     token: token,
+  //     domain: this.configService.get<string>('DOMAIN'),
+  //     path: this.configService.get<string>('PATH'),
+  //     secure: true,
+  //     maxAge: this.configService.get<number>('AT_MAXAGE'),
+  //   };
+  // }
+
+  // async signOut(): Promise<any> {
+  //   return {
+  //     token: '',
+  //     domain: this.configService.get<string>('DOMAIN'),
+  //     path: this.configService.get<string>('PATH'),
+  //     secure: true,
+  //     maxAge: 0,
+  //   };
+  // }
 
   async register(_user: User): Promise<any> {
     const hashedPassword = await hash(_user.password, 10);
@@ -72,6 +123,7 @@ export class AuthService {
     }
   }
 
+  /* ------------------------------------ private function ------------------------------------ */
   private async verifyPassword(
     _plainTextPassword: string,
     _hashedPassword: string,
