@@ -43,10 +43,12 @@ export class AuthService {
 
     return {
       accessToken: token,
-      domain: this.configService.get<string>('DOMAIN'),
-      path: this.configService.get<string>('PATH'),
-      secure: true,
+      domain: this.configService.get<string>('COOKIE_DOMAIN'),
+      path: '/',
       maxAge: this.configService.get<number>('AT_MAXAGE'),
+      signed: true,
+      secure: false,
+      httpOnly: false,
     };
   }
 
@@ -60,27 +62,31 @@ export class AuthService {
     return {
       refreshToken: token,
       domain: this.configService.get<string>('DOMAIN'),
-      path: this.configService.get<string>('PATH'),
-      secure: true,
-      maxAge: this.configService.get<number>('AT_MAXAGE'),
+      path: '/',
+      maxAge: this.configService.get<number>('RT_MAXAGE'),
+      signed: true,
+      secure: false,
+      httpOnly: true,
     };
   }
 
-  getCookiesForLogOut() {
+  getCookiesForSignOut() {
     return {
       accessOption: {
-        refreshToken: '',
         domain: this.configService.get<string>('DOMAIN'),
         path: this.configService.get<string>('PATH'),
-        secure: true,
         maxAge: 0,
+        signed: true,
+        secure: true,
+        httpOnly: false,
       },
       refreshOption: {
-        refreshToken: '',
         domain: this.configService.get<string>('DOMAIN'),
         path: this.configService.get<string>('PATH'),
-        secure: true,
         maxAge: 0,
+        signed: true,
+        secure: true,
+        httpOnly: true,
       },
     };
   }
@@ -123,7 +129,7 @@ export class AuthService {
     }
   }
 
-  /* ------------------------------------ private function ------------------------------------ */
+  /* ************************************ private function ************************************ */
   private async verifyPassword(
     _plainTextPassword: string,
     _hashedPassword: string,

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { compare, hash } from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 
@@ -44,5 +45,31 @@ export class UsersService {
   // ************************************ DELETE ************************************ //
   async remove(_id: number): Promise<void> {
     await this.usersRepository.delete(_id);
+  }
+
+  // ************************************ JWT Token ************************************ //
+  async setCurrentRefreshToken(_refreshToken: string, _id: number) {
+    const hashedRefreshToken = await hash(_refreshToken, 10);
+    await this.usersRepository.update(_id, {
+      hashedRefreshToken: hashedRefreshToken,
+    });
+    return hashedRefreshToken;
+  }
+
+  async getUserIfRefreshTokenMatches(_refreshToken: string, _id: number) {
+    const user = await this.findById(_id);
+
+    const isRefreshTokenMatching = await compare(
+      _refreshToken,
+      user.hashedRefreshToken,
+    );
+
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+  }
+
+  async removeRefreshToken(id: number) {
+    return this.usersRepository.update(id, { hashedRefreshToken: null });
   }
 }

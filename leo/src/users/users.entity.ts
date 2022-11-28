@@ -14,5 +14,5 @@ export class User {
 
   @Column({ nullable: true })
   @Exclude()
-  refreshToken?: string;
+  hashedRefreshToken?: string;
 }
